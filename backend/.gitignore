@@ -1,0 +1,15 @@
+# Ambientes Virtuais do Python
+venv/
+env/
+.venv/
+
+# Arquivos compilados do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos de banco de dados locais (opcional, mas recomendado)
+*.sqlite3
+
+# Variáveis de ambiente (senhas e chaves)
+.env
