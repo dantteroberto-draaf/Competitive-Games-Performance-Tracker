@@ -52,3 +52,53 @@ def remover_partida(partida_id: int,
 
 
     return {"mensagem": f"A partida {partida_id} foi removida com sucesso!"}
+
+# rota para mostrar as estatísticas do jogador
+@app.get("/stats")
+def exibir_stats(sessao_db: Session = Depends(db.get_db)):
+    todas_as_partidas = sessao_db.query(models.Partida).all()
+
+    total = len(todas_as_partidas)
+    vitorias = 0
+    derrotas = 0
+    abates = 0
+    mortes = 0
+    assistencias = 0
+
+    # caso não haja partidas registradas
+    if total == 0:
+        return {
+            "total_partidas": 0,
+            "total_vitorias": 0,
+            "total_derrotas": 0,
+            "taxa_vitoria": 0.0,
+            "total_abates": 0,
+            "total_mortes": 0,
+            "total_assists": 0,
+            "ama_medio": 0
+        }
+    
+    for partida in todas_as_partidas:
+        abates += partida.abates
+        mortes += partida.mortes
+        assistencias += partida.assistencias
+
+        if partida.resultado == "Vitória":
+            vitorias += 1
+        else:
+            derrotas += 1
+
+    winrate = vitorias/total * 100
+
+    ama = (abates + assistencias) / mortes
+
+    return {
+        "total_partidas": total,
+        "total_vitorias": vitorias,
+        "total_derrotas": derrotas,
+        "taxa_vitoria": round(winrate, 1), # arredondando a taxa de vitórias para 1 casa decimal
+        "total_abates": abates,
+        "total_mortes": mortes,
+        "total_assists": assistencias,
+        "ama_medio": round(ama, 2)
+    }

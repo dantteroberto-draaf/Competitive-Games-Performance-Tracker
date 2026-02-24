@@ -17,3 +17,13 @@ class PartidaResponse(PartidaBase):
 
     class Config:
         from_attributes = True
+
+class StatsResponse(BaseModel):
+    total_partida: int
+    total_vitorias: int
+    total_derrotas: int
+    taxa_vitorias: float
+    total_abates: int
+    total_mortes: int
+    total_assists: int
+    ama_medio: float
