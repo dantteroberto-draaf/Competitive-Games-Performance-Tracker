@@ -6,6 +6,32 @@
       <p class="text-zinc-400">Registre suas partidas e acompanhe sua evolução</p>
     </header>
 
+<div class="flex gap-2 mb-6">
+      <button 
+        (click)="filtrar('Todos')" 
+        [class]="filtroAtual === 'Todos' ? 'bg-white text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'"
+        class="px-4 py-2 rounded-full font-bold text-sm transition-colors"
+      >
+        Todos
+      </button>
+      
+      <button 
+        (click)="filtrar('Valorant')"
+        [class]="filtroAtual === 'Valorant' ? 'bg-rose-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'"
+        class="px-4 py-2 rounded-full font-bold text-sm transition-colors"
+      >
+        Valorant
+      </button>
+
+      <button 
+        (click)="filtrar('League of Legends')"
+        [class]="filtroAtual === 'League of Legends' ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'"
+        class="px-4 py-2 rounded-full font-bold text-sm transition-colors"
+      >
+        LoL
+      </button>
+    </div>
+
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-lg text-center">
         <div class="text-zinc-500 text-xs uppercase font-bold">Total</div>
@@ -41,7 +67,14 @@
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="md:col-span-2">
           <label class="block text-xs text-zinc-500 mb-1">Jogo</label>
-          <input type="text" [(ngModel)]="novaPartida.jogo" placeholder="Ex: Valorant" class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 focus:border-emerald-500 focus:outline-none">
+          <select 
+            [(ngModel)]="novaPartida.jogo" 
+            class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 focus:border-emerald-500 focus:outline-none appearance-none"
+          >
+            <option value="" disabled selected>Selecione...</option>
+            <option value="Valorant">Valorant</option>
+            <option value="League of Legends">League of Legends</option>
+          </select>
         </div>
 
         <div class="md:col-span-1">
@@ -76,7 +109,7 @@
         Nenhuma partida registrada ainda.
       </div>
 
-      <div *ngFor="let partida of partidas" class="group bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center justify-between hover:border-emerald-500/50 transition-all">
+      <div *ngFor="let partida of partidasFiltradas" class="group bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center justify-between hover:border-emerald-500/50 transition-all">
         <div class="flex items-center gap-4">
           <div [class]="partida.resultado === 'Vitória' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'" class="p-2 rounded font-bold text-xs uppercase tracking-wider w-20 text-center">
             {{ partida.resultado }}

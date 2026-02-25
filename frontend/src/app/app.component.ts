@@ -6,13 +6,16 @@ import { ApiService, Partida } from './services/api';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule], // <--- Módulos obrigatórios
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  // 1. Variável para guardar a lista de partidas que vem do Python
+
+  filtroAtual = 'Todos';
+  // Variável para guardar a lista de partidas que vem do Python
   partidas: Partida[] = [];
+  partidasFiltradas: Partida[] = [];
 
   totalPartidas = 0;
   totalVitorias = 0;
@@ -23,19 +26,17 @@ export class AppComponent implements OnInit {
   totalAssistencias = 0;
   ama_medio = 0;
 
-  // 2. Variável para guardar os dados do formulário
   novaPartida: Partida = {
-    jogo: '',
+    jogo: 'Valorant',
     resultado: 'Vitória',
     abates: 0,
     mortes: 0,
     assistencias: 0
   };
 
-  // 3. Injeção de Dependência: O Angular te entrega o ApiService pronto
+
   constructor(private apiService: ApiService) {}
 
-  // 4. ngOnInit: Roda automaticamente assim que a tela abre
   ngOnInit() {
     this.carregarPartidas();
   }
@@ -50,9 +51,9 @@ export class AppComponent implements OnInit {
     this.ama_medio = 0;
 
 
-    this.totalPartidas = this.partidas.length;
+    this.totalPartidas = this.partidasFiltradas.length;
 
-    this.totalVitorias = this.partidas.filter(p => p.resultado == "Vitória").length;
+    this.totalVitorias = this.partidasFiltradas.filter(p => p.resultado == "Vitória").length;
 
     this.totalDerrotas = this.totalPartidas - this.totalVitorias;
 
@@ -62,7 +63,7 @@ export class AppComponent implements OnInit {
         this.winRate = 0;
     }
 
-    for (const partida of this.partidas){
+    for (const partida of this.partidasFiltradas){
         this.totalAbates += partida.abates;
         this.totalMortes += partida.mortes;
         this.totalAssistencias += partida.assistencias;
@@ -81,6 +82,7 @@ export class AppComponent implements OnInit {
     this.apiService.listarPartidas().subscribe({
       next: (dados) => {
         this.partidas = dados; // Guarda os dados na variável
+        this.partidasFiltradas = dados;
         this.calcularEstatisticas();
         console.log('Partidas carregadas:', dados);
       },
@@ -88,6 +90,17 @@ export class AppComponent implements OnInit {
     });
   }
 
+  filtrar(jogo: string){
+    this.filtroAtual = jogo;
+
+    if (jogo == "Todos"){
+      this.partidasFiltradas = this.partidas;
+    }
+    else {
+      this.partidasFiltradas = this.partidas.filter(p => p.jogo.toLowerCase().includes(jogo.toLowerCase()))
+    }
+    this.calcularEstatisticas()
+  }
   // Função do botão "Salvar"
   salvar() {
     this.apiService.salvarPartida(this.novaPartida).subscribe({
@@ -102,7 +115,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // Função do botão "Deletar" (Lixeira)
+  // Função do botão "Deletar"
   deletar(id?: number) {
     if (!id) return;
     
@@ -111,6 +124,7 @@ export class AppComponent implements OnInit {
         next: () => {
           // Remove da lista visualmente (filtra quem tem ID diferente do apagado)
           this.partidas = this.partidas.filter(p => p.id !== id);
+          this.filtrar(this.filtroAtual);
           this.calcularEstatisticas()
         },
         error: (erro) => console.error('Erro ao deletar:', erro)
